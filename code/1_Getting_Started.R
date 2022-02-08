@@ -1,7 +1,7 @@
 packageVersion('shiny')
 library(shiny)
 
-#1
+#1 ---------
 ui <- fluidPage(
   "testing 1 2 3!"
 )
@@ -10,7 +10,7 @@ server <- function(input, output, session) {
 }
 shinyApp(ui = ui, server = server)
 
-#2
+#2 ---------
 ui2 <- fluidPage(
   selectInput(inputId = "dataset", label = "Dataset", choices = ls("package:datasets"), selected = "airmiles"), #can include default choice with `selected`
   verbatimTextOutput("summary"),
@@ -18,7 +18,7 @@ ui2 <- fluidPage(
 )
 shinyApp(ui2, server) #Haven't defined how input and output are related so there is not output
 
-#3
+#3 ---------
 server3 <- function(input, output, session) {
   output$summary <- renderPrint({ #all outputs require a render function. Need to choose a suitable render type, eg. renderPrint, renderTable, renderImage
     dataset <- get(x = input$dataset, pos = "package:datasets")
@@ -31,7 +31,7 @@ server3 <- function(input, output, session) {
 }
 shinyApp(ui2, server3)
 
-#4 Updating server() to use reactive expressions to retrieve the dataset once.
+#4 Updating server() to use reactive expressions to retrieve the dataset once. ---------
 server4 <- function(input, output, session) {
   dataset <- reactive({
     get(x = input$dataset, "package:datasets")
@@ -45,7 +45,7 @@ server4 <- function(input, output, session) {
 }
 shinyApp(ui2, server4)
 
-#Exercise 1
+#Exercise 1 ---------
 ui_ex <- fluidPage(
   numericInput(inputId = "age", label = "How old are you?", value = NA),
   textInput(inputId = "name", label = "What's your name?", value = NA),
@@ -63,7 +63,7 @@ server_ex <- function(input, output, session){
 }
 shinyApp(ui = ui_ex, server = server_ex)
 
-# ex2
+# ex2 ---------
 ui_ex2 <- fluidPage(
   sliderInput("x", label = "If x is", min = 1, max = 50, value = 30),
   "then x times 5 is",
@@ -78,7 +78,7 @@ server_ex2 <- function(input, output, session) {
 
 shinyApp(ui_ex2, server_ex2)
 
-# ex3
+# ex3 ---------
 ui_ex3 <- fluidPage(
   sliderInput("x", label = "If x is", min = 1, max = 50, value = 30),
   sliderInput("y", label = "and y is", min = 1, max = 50, value = 30),
@@ -93,7 +93,7 @@ server_ex3 <- function(input, output, session){
 }
 shinyApp(ui_ex3, server_ex3)
 
-# ex4
+# ex4 -------
 ui_ex4 <- fluidPage(
   sliderInput("x", "If x is", min = 1, max = 50, value = 30),
   sliderInput("y", "and y is", min = 1, max = 50, value = 5),
@@ -120,3 +120,27 @@ server_ex4 <- function(input, output, session) {
 }
 
 shinyApp(ui_ex4, server_ex4)
+
+# Ex 5 -------------
+library(ggplot2)
+datasets <- c("economics", "faithfuld", "seals")
+ui_ex5 <- fluidPage(
+  selectInput("dataset", "Dataset", choices = datasets, selected = "economics"),
+  verbatimTextOutput("summary"),
+  plotOutput("plot")
+)
+
+server_ex5 <- function(input, output, session) {
+  dataset <- reactive({
+    get(input$dataset, "package:ggplot2")
+  })
+  output$summary <- renderPrint({
+    summary(dataset())
+  })
+  
+  output$plot <- renderPlot({
+    plot(dataset())
+  }, res = 96)
+}
+
+shinyApp(ui_ex5, server_ex5)
