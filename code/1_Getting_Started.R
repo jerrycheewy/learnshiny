@@ -1,0 +1,2 @@
+packageVersion('shiny')
+library(shiny)
